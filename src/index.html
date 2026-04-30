@@ -7,12 +7,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&display=swap">
     <link rel="stylesheet" href="minterface.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.9.0/github-markdown.min.css">
     <link rel="stylesheet" href="app.css">
     <script crossorigin="anonymous" defer src="https://kit.fontawesome.com/46660cdeff.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-enterprise@35.2.0/dist/ag-grid-enterprise.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@15/marked.min.js"></script>
     <script defer src="renderer.js"></script>
   </head>
-  <body>
+  <body class="compact">
     <header>
       <div class="brand">Devilsnare</div>
       <i id="spinner" class="fa-solid fa-spinner fa-spin" hidden></i>
@@ -21,8 +23,33 @@
       <button id="btn-settings" class="button button-icon"><i class="fa-regular fa-gear"></i></button>
     </header>
     <div id="grid"></div>
+    <div id="drawer" hidden>
+      <div id="drawer-header">
+        <div class="bar">
+          <h3 id="drawer-title"></h3>
+          <button id="drawer-github" class="button button-icon"><i class="fa-brands fa-github"></i></button>
+          <button id="drawer-editor" class="button outline">VS Code</button>
+          <span class="fill"></span>
+          <button id="drawer-close" class="button button-icon"><i class="fa-regular fa-xmark"></i></button>
+        </div>
+        <div id="drawer-status"></div>
+      </div>
+      <div id="drawer-body" class="markdown-body"></div>
+      <div id="drawer-actions"></div>
+    </div>
     <dialog id="settings">
       <h3>Settings</h3>
+      <strong>Appearance</strong>
+      <div class="button-group" id="mode-select">
+        <button class="button" data-mode="system">System</button>
+        <button class="button active" data-mode="light">Light</button>
+        <button class="button" data-mode="dark">Dark</button>
+      </div>
+      <strong>AI harness</strong>
+      <div class="button-group" id="harness-select">
+        <button class="button active" data-harness="terminal">Terminal</button>
+        <button class="button" data-harness="desktop">Claude Desktop</button>
+      </div>
       <strong>Code folders</strong>
       <div id="roots-list"></div>
       <div class="bar">
