@@ -1,0 +1,105 @@
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  padding: 0 1rem 1rem 1rem;
+}
+
+.brand {
+  align-items: center;
+  display: flex;
+  font-size: 1.5rem;
+  font-weight: 700;
+  gap: 0.5rem;
+  letter-spacing: -0.03em;
+}
+
+#spinner {
+  color: var(--color-half);
+}
+
+#grid {
+  flex: 1;
+}
+
+#grid .ag-cell {
+  align-items: center;
+  display: flex;
+}
+
+#grid .ag-row:hover .action-primary {
+  background: var(--color-darkest);
+  color: var(--color-lightest);
+}
+
+#views {
+  -webkit-app-region: no-drag;
+  display: flex;
+  gap: 1rem;
+}
+
+.view {
+  color: var(--color-half);
+  cursor: pointer;
+}
+
+.view.active, .view:hover {
+  color: var(--color-darkest);
+}
+
+.view-count {
+  color: var(--color-light);
+}
+
+.view:hover .view-count, .view.active .view-count {
+  color: var(--color-half);
+}
+
+.fill {
+  flex: 1;
+}
+
+header {
+  -webkit-app-region: drag;
+  align-items: baseline;
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0 1rem 4rem;
+}
+
+#btn-settings {
+  -webkit-app-region: no-drag;
+  color: var(--color-half);
+}
+
+dialog[open] {
+  border: 1px solid var(--color-light);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 24rem;
+  padding: 1.5rem;
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 17, 0.3);
+}
+
+.root-item {
+  align-items: center;
+  border: 1px solid var(--color-light);
+  border-radius: var(--radius);
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+}
+
+.root-item button {
+  color: var(--color-half);
+}
+
+.root-item button:hover {
+  color: var(--status-red);
+}

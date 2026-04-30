@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Devilsnare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&display=swap">
+    <link rel="stylesheet" href="minterface.css">
+    <link rel="stylesheet" href="app.css">
+    <script crossorigin="anonymous" defer src="https://kit.fontawesome.com/46660cdeff.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-enterprise@35.2.0/dist/ag-grid-enterprise.min.js"></script>
+    <script defer src="renderer.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="brand">Devilsnare</div>
+      <i id="spinner" class="fa-solid fa-spinner fa-spin" hidden></i>
+      <div id="views"></div>
+      <div class="fill"></div>
+      <button id="btn-settings" class="button button-icon"><i class="fa-regular fa-gear"></i></button>
+    </header>
+    <div id="grid"></div>
+    <dialog id="settings">
+      <h3>Settings</h3>
+      <strong>Code folders</strong>
+      <div id="roots-list"></div>
+      <div class="bar">
+        <button id="btn-add-root" class="button outline">Add folder</button>
+        <span class="fill"></span>
+        <button id="btn-close-settings" class="button primary">Done</button>
+      </div>
+    </dialog>
+  </body>
+</html>
