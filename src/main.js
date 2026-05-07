@@ -322,7 +322,7 @@ const scanSessions = async repos => {
         const prev = cwdCache.get(cwd)
         if (!prev || mtime > prev.mtime) {
           const idx = codexSessions.find(s => f.includes(s.id))
-          cwdCache.set(cwd, { date: new Date(mtime).toISOString(), harness: 'codex', id: d.payload?.id || '', mtime, topic: idx?.thread_name || '' })
+          cwdCache.set(cwd, { cwd, date: new Date(mtime).toISOString(), harness: 'codex', id: d.payload?.id || '', mtime, topic: idx?.thread_name || '' })
         }
       } catch {}
     }
@@ -399,7 +399,7 @@ ipcMain.handle('action:run', async (_, action, cwd) => {
     const sessions = readJson(sessionsPath, { matched: {} })
     const session = sessions.matched?.[cwd]
     const resumeCmd = session
-      ? (session.cwd !== cwd ? `cd ${session.cwd} && claude --resume ${session.id}` : `claude --resume ${session.id}`)
+      ? (session.cwd !== cwd ? `cd ${session.cwd} && ${session.harness} --resume ${session.id}` : `${session.harness} --resume ${session.id}`)
       : 'claude'
 
     const cmds = [viewCmd, resumeCmd].filter(Boolean)
