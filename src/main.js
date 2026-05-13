@@ -396,36 +396,73 @@ ipcMain.handle('action:run', async (_, action, cwd) => {
     const port = getPort(path.basename(cwd))
     const isDevilsnare = path.basename(cwd) === 'devilsnare'
     const viewCmd = isDevilsnare ? null : viewMethod === 'npm start' ? 'npm start' : viewMethod === 'npm run dev' ? 'npm run dev' : viewMethod === 'npx serve' ? `npx serve -l ${port}` : null
+
     const sessions = readJson(sessionsPath, { matched: {} })
     const session = sessions.matched?.[cwd]
-    const resumeCmd = session
-      ? (session.cwd !== cwd ? `cd ${session.cwd} && ${session.harness} --resume ${session.id}` : `${session.harness} --resume ${session.id}`)
-      : 'claude'
+    const isRootSession = session && session.cwd !== cwd
 
-    const cmds = [viewCmd, resumeCmd].filter(Boolean)
-    if (!cmds.length) return exec('open', ['-a', 'Visual Studio Code', cwd])
+    const FOCUS = '0.5'
+    const SHELL = '1.5'
 
-    const terminals = cmds.map(cmd =>
-      `keystroke "\`" using {control down, shift down}\n    delay 1.5\n    keystroke "${cmd.replace(/"/g, '\\"')}"\n    keystroke return`
-    ).join('\n    delay 1\n  end tell\nend tell\ndelay 0.5\ntell application "Visual Studio Code" to activate\ndelay 0.5\ntell application "System Events"\n  tell process "Code"\n    ')
+    const viewTerminal = viewCmd ? [
+      `    keystroke "\`" using {control down, shift down}`,
+      `    delay ${SHELL}`,
+      `    keystroke "${viewCmd}"`,
+      '    keystroke return',
+      `    delay ${FOCUS}`,
+      '    keystroke "j" using command down',
+    ].join('\n') : ''
+
+    const resumeBlock = isRootSession ? [
+      `    keystroke "\`" using {control down, shift down}`,
+      `    delay ${SHELL}`,
+      `    keystroke "cd ${session.cwd} && ${session.harness} ${session.harness === 'codex' ? 'resume' : '--resume'} ${session.id}"`,
+      '    keystroke return',
+    ].join('\n') : session ? [
+      '    keystroke "p" using {command down, shift down}',
+      `    delay ${FOCUS}`,
+      '    keystroke "Claude Code: Open in Side Bar"',
+      `    delay ${FOCUS}`,
+      '    keystroke return',
+      `    delay ${SHELL}`,
+      '    keystroke "/resume"',
+      `    delay ${FOCUS}`,
+      '    keystroke return',
+      `    delay ${SHELL}`,
+      '    key code 125',
+      `    delay ${FOCUS}`,
+      '    keystroke return',
+    ].join('\n') : [
+      '    keystroke "p" using {command down, shift down}',
+      `    delay ${FOCUS}`,
+      '    keystroke "Claude Code: Open in Side Bar"',
+      `    delay ${FOCUS}`,
+      '    keystroke return',
+    ].join('\n')
+
+    const openBrowser = viewMethod === 'npx serve' ? `\ndelay 1\ndo shell script "open http://localhost:${port}"` : ''
 
     spawn('osascript', ['-e', [
       `do shell script "code --new-window ${cwd}"`,
-      'delay 1',
+      `delay ${SHELL}`,
       'tell application "Visual Studio Code" to activate',
-      'delay 0.3',
+      `delay ${FOCUS}`,
       'tell application "System Events"',
       '  tell process "Code"',
+      '    key code 53',
+      `    delay ${FOCUS}`,
       '    keystroke "p" using {command down, shift down}',
-      '    delay 0.3',
+      `    delay ${FOCUS}`,
       '    keystroke "Terminal: Kill All Terminals"',
-      '    delay 0.3',
+      `    delay ${FOCUS}`,
       '    keystroke return',
-      '    delay 0.5',
-      `    ${terminals}`,
+      `    delay ${FOCUS}`,
+      viewTerminal,
+      viewTerminal ? `    delay ${SHELL}\n  end tell\nend tell\ndelay ${FOCUS}\ntell application "Visual Studio Code" to activate\ndelay ${FOCUS}\ntell application "System Events"\n  tell process "Code"` : '',
+      resumeBlock,
       '  end tell',
-      'end tell',
-    ].join('\n')])
+      'end tell' + openBrowser,
+    ].filter(Boolean).join('\n')])
     return
   }
   if (action === 'Open on GitHub') {
