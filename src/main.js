@@ -440,8 +440,6 @@ ipcMain.handle('action:run', async (_, action, cwd) => {
       '    keystroke return',
     ].join('\n')
 
-    const openBrowser = viewMethod === 'npx serve' ? `\ndelay 1\ndo shell script "open http://localhost:${port}"` : ''
-
     spawn('osascript', ['-e', [
       `do shell script "code --new-window ${cwd}"`,
       `delay ${SHELL}`,
@@ -461,8 +459,10 @@ ipcMain.handle('action:run', async (_, action, cwd) => {
       viewTerminal ? `    delay ${SHELL}\n  end tell\nend tell\ndelay ${FOCUS}\ntell application "Visual Studio Code" to activate\ndelay ${FOCUS}\ntell application "System Events"\n  tell process "Code"` : '',
       resumeBlock,
       '  end tell',
-      'end tell' + openBrowser,
-    ].filter(Boolean).join('\n')])
+      'end tell',
+    ].filter(Boolean).join('\n')]).on('close', () => {
+      if (viewMethod === 'npx serve') exec('open', ['-a', 'Google Chrome', `http://localhost:${port}`])
+    })
     return
   }
   if (action === 'Open on GitHub') {
@@ -495,18 +495,19 @@ const getPort = name => {
   return 3000 + Math.floor(Math.random() * 5000)
 }
 
-ipcMain.handle('serve:start', async (_, name, cwd) => {
+ipcMain.handle('serve:start', async (_, cwd, viewMethod) => {
   if (servers.has(cwd)) return servers.get(cwd).port
-  const port = getPort(name)
-  const hasDevScript = fs.existsSync(path.join(cwd, 'package.json')) &&
-    JSON.parse(fs.readFileSync(path.join(cwd, 'package.json'), 'utf8')).scripts?.dev
-  const proc = hasDevScript
-    ? spawn('npm', ['run', 'dev'], { cwd, env: { ...process.env, PORT: String(port) }, stdio: 'ignore' })
-    : spawn('npx', ['serve', '-l', String(port)], { cwd, stdio: 'ignore' })
+  const port = getPort(path.basename(cwd))
+  const [cmd, ...args] = viewMethod === 'npm start' ? ['npm', 'start']
+    : viewMethod === 'npm run dev' ? ['npm', 'run', 'dev']
+    : ['npx', 'serve', '-l', String(port)]
+  const proc = spawn(cmd, args, { cwd, env: { ...process.env, PORT: String(port) }, stdio: 'ignore' })
   servers.set(cwd, { port, proc })
   proc.on('close', () => servers.delete(cwd))
-  await new Promise(r => setTimeout(r, 1500))
-  shell.openExternal(`http://localhost:${port}`)
+  if (viewMethod !== 'npm start') {
+    await new Promise(r => setTimeout(r, 1500))
+    exec('open', ['-a', 'Google Chrome', `http://localhost:${port}`])
+  }
   return port
 })
 

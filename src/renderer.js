@@ -72,7 +72,7 @@ const actionCellRenderer = p => {
 
   const serve = document.createElement('button')
   serve.className = 'button button-icon'
-  if (p.data.viewMethod) {
+  if (p.data.viewMethod && p.data.name !== 'devilsnare') {
     const isElectron = p.data.viewMethod === 'npm start'
     serve.innerHTML = isElectron ? '<i class="fa-regular fa-display"></i>' : '<i class="fa-regular fa-browser"></i>'
     serve.onclick = async e => {
@@ -83,12 +83,12 @@ const actionCellRenderer = p => {
         serve.innerHTML = isElectron ? '<i class="fa-regular fa-display"></i>' : '<i class="fa-regular fa-browser"></i>'
       } else {
         serve.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'
-        await window.api.serveStart(p.data.name, p.data.path)
-        serve.innerHTML = isElectron ? '<i class="fa-solid fa-display"></i>' : '<i class="fa-solid fa-browser"></i>'
+        await window.api.serveStart(p.data.path, p.data.viewMethod)
+        serve.innerHTML = isElectron ? '<i class="fa-regular fa-display-slash"></i>' : '<i class="fa-solid fa-browser"></i>'
       }
     }
     window.api.serveStatus(p.data.path).then(s => {
-      if (s.running) serve.innerHTML = isElectron ? '<i class="fa-solid fa-display"></i>' : '<i class="fa-solid fa-browser"></i>'
+      if (s.running) serve.innerHTML = isElectron ? '<i class="fa-regular fa-display-slash"></i>' : '<i class="fa-solid fa-browser"></i>'
     })
   } else {
     serve.innerHTML = '<i class="fa-regular fa-ban"></i>'

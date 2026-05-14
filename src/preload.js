@@ -20,7 +20,7 @@ contextBridge.exposeInMainWorld('api', {
   getSessions: () => ipcRenderer.invoke('sessions:get'),
   scan: () => ipcRenderer.invoke('scan'),
   scanSessions: repos => ipcRenderer.invoke('sessions:scan', repos),
-  serveStart: (name, cwd) => ipcRenderer.invoke('serve:start', name, cwd),
+  serveStart: (cwd, viewMethod) => ipcRenderer.invoke('serve:start', cwd, viewMethod),
   serveStatus: cwd => ipcRenderer.invoke('serve:status', cwd),
   serveStop: cwd => ipcRenderer.invoke('serve:stop', cwd),
   setTheme: mode => ipcRenderer.invoke('theme:set', mode),
